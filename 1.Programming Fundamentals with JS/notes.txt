@@ -1,0 +1,8 @@
+1.Resources
+
+2.IT Talks
+
+3.Language Comparison
+
+4.Basic Syntax, Conditional Statements and Loops - Lab
+
