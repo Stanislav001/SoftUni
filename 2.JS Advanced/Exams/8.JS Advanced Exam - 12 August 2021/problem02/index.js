@@ -1,5 +1,4 @@
 class ArtGallery {
-
     constructor(creator) {
         this.creator = creator;
         this.possibleArticles = {
@@ -44,21 +43,40 @@ class ArtGallery {
     }
 
     buyArticle(articleModel, articleName, guestName) {
-        let index = this.listOfArticles.findIndex(x => x.articleName === articleName);
-
-        let existInGuest = this.guests.findIndex(x => x.guestName === guestName);
-
-        if (index === -1) {
-            throw new Error("This article is not found.");
-        } 
-        if (this.listOfArticles[index].quantity === 0) {
-            return `The ${articleName} is not available.`
+        if (!this.listOfArticles.some(x => x.articleName == articleName && x.articleModel == articleModel)) {
+            throw new Error(`This article is not found.`);
         }
-        if (existInGuest === -1) {
-            return "This guest is not invited.";
+        let articleToBuy = this.listOfArticles.find(x => x.articleModel == articleModel && x.articleName == articleName);
+
+        if (articleToBuy.quantity <= 0) {
+            throw new Error(`The {articleName} is not available.`);
+        }
+        if (!this.guests.some(x => x.guestName == guestName)) {
+            throw new Error(`This guest is not invited.`);
         }
 
-        
+        let guest = this.guests.find(x => x.guestName == guestName);
+
+        if (guest.points < this.possibleArticles[articleModel.toLowerCase()]) {
+            return `You need to more points to purchase the article.`;
+        } else {
+            guest.points -= this.possibleArticles[articleModel.toLowerCase()];
+            articleToBuy.quantity--;
+            guest.purchaseArticle++;
+        }
+        return `${guestName} successfully purchased the article worth ${this.possibleArticles[articleModel.toLowerCase()]} points.`;
+    }
+
+    showGalleryInfo(criteria) {
+        if (criteria === 'article') {
+            return `Articles information:\n${this.listOfArticles
+                .map(article => `${article.articleModel} - ${article.articleName} - ${article.quantity}`)
+                .join('\n')}`;
+        }
+
+        if (criteria === 'guest') {
+            return `Guests information:\n${this.guests.map(guest => `${guest.guestName} - ${guest.purchaseArticle}`).join('\n')}`;
+        }
     }
 }
 
@@ -68,6 +86,7 @@ artGallery.addArticle('Item', 'Ancient vase', 2);
 artGallery.addArticle('picture', 'Mona Liza', 1);
 artGallery.inviteGuest('John', 'Vip');
 artGallery.inviteGuest('Peter', 'Middle');
-console.log(artGallery.buyArticle('picture', 'Mona Liza', 'John'));
-console.log(artGallery.buyArticle('item', 'Ancient vase', 'Peter'));
-console.log(artGallery.buyArticle('item', 'Mona Liza', 'John'));
+artGallery.buyArticle('picture', 'Mona Liza', 'John');
+artGallery.buyArticle('item', 'Ancient vase', 'Peter');
+console.log(artGallery.showGalleryInfo('article'));
+console.log(artGallery.showGalleryInfo('guest'));
