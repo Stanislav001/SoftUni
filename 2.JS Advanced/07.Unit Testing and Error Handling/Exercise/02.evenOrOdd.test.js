@@ -1,24 +1,24 @@
 const isOddOrEven = require('./02.evenOrOdd');
-const { assert } = require('chai');
+const { expect } = require('chai');
 
-describe('Is odd or even function tests: ', () => {
-    it('should return undefined if parameter is not a string', () => {
-        assert.equal(isOddOrEven(undefined), undefined);
-        assert.equal(isOddOrEven(true), undefined);
-        assert.equal(isOddOrEven(10), undefined);
-        assert.equal(isOddOrEven([]), undefined);
-        assert.equal(isOddOrEven({}), undefined);
+describe('Is Odd Or Even', () => {
+    it('Should return undefined if the passed param is a number', () => {
+        expect(isOddOrEven(2)).to.be.undefined;
     });
 
-    it ('should return odd or event when parameter is a string', () => {
-        assert.equal(isOddOrEven('test string'), 'odd' || 'even');
+    it('Should return undefined if the passed param is an array ', () => {
+        expect(isOddOrEven([1, 2])).to.be.undefined;
     });
 
-    it('should return odd if parameter is string with odd length', () => {
-        assert.equal(isOddOrEven('str'), "odd");
+    it('Should return undefined if the passed param is an object', () => {
+        expect(isOddOrEven({ 1: 'yes' })).to.be.undefined;
     });
 
-    it('should return even if parameter is string with even length', () => {
-        assert.equal(isOddOrEven('st'), "even");
+    it('Should return odd if the passed param is with odd length', () => {
+        expect(isOddOrEven('lol')).to.equal('odd');
+    });
+
+    it('Should return odd if the passed even is with odd length', () => {
+        expect(isOddOrEven('word')).to.equal('even');
     });
 });

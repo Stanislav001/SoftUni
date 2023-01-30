@@ -1,24 +1,36 @@
 const lookupChar = require('./03.charLookup');
-const { assert } = require('chai');
+const { expect } = require('chai');
 
-describe('lookupChar function tests: ', () => {
-    it('should return undefined when first arg is not a string and second is not a number', () => {
-        assert.equal(lookupChar(2, 3), undefined);
-        assert.equal(lookupChar(10, ''), undefined);
-        assert.equal(lookupChar([], '200'), undefined);
-        assert.equal(lookupChar(true, ''), undefined);
-        assert.equal(lookupChar('test', '2'), undefined);
-        assert.equal(lookupChar(undefined, null), undefined);
-        assert.equal(lookupChar('test', 2.5), undefined);
+describe('Look up for a char and return it\'s index', () => {
+    it('Should return undefined if the first param is not a string', () => {
+        expect(lookupChar(2, 3)).to.be.undefined;
     });
 
-    it('should return Incorrect index when index bigger or equal to the string length or a negative number', () => {
-        assert.equal(lookupChar('world', 6), 'Incorrect index');
-        assert.equal(lookupChar('hi', -2), 'Incorrect index');
+    it('Should return undefined if the passed index is not a number', () => {
+        expect(lookupChar('world', '2')).to.be.undefined;
     });
 
-    it('should return the character at the specified index in the string', () => {
-        assert.equal(lookupChar('hi', 1), 'i');
-        assert.equal(lookupChar('Hi', 0), 'H');
+    it('Should return undefined if both params are incorrect type', () => {
+        expect(lookupChar([], '2')).to.be.undefined;
+    });
+
+    it('Should return Incorrect index if the index is lower than 0', () => {
+        expect(lookupChar('world', -1)).to.equal('Incorrect index');
+    });
+
+    it('Should return Incorrect index if the index is higher than the passed string length', () => {
+        expect(lookupChar('world', 6)).to.equal('Incorrect index');
+    });
+
+    it('Should return d', () => {
+        expect(lookupChar('world', 5.5)).to.be.undefined;
+    });
+
+    it('Should return d', () => {
+        expect(lookupChar('world', 4)).to.equal('d');
+    });
+
+    it('Should return l', () => {
+        expect(lookupChar('world', 3)).to.equal('l');
     });
 });

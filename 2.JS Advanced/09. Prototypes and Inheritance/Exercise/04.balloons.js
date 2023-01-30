@@ -9,22 +9,18 @@ function balloons() {
     class PartyBalloon extends Balloon {
         constructor(color, hasWeight, ribbonColor, ribbonLength) {
             super(color, hasWeight);
-            this.ribbonColor = ribbonColor;
-            this._ribbon = {
-                color: ribbonColor,
-                length: ribbonLength
-            };
+            this._ribbon = {color: ribbonColor, length: ribbonLength};
         }
 
         get ribbon() {
-            return this._ribbon;
+            return this._ribbon
         }
     }
 
     class BirthdayBalloon extends PartyBalloon {
         constructor(color, hasWeight, ribbonColor, ribbonLength, text) {
             super(color, hasWeight, ribbonColor, ribbonLength);
-            this._text = text
+            this._text = text;
         }
 
         get text() {
@@ -32,9 +28,5 @@ function balloons() {
         }
     }
 
-    return {
-        Balloon,
-        PartyBalloon,
-        BirthdayBalloon
-    }
+    return {Balloon, PartyBalloon, BirthdayBalloon}
 }
