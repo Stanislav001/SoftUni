@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch</title>
+</head>
+
+<body>
+    <h1>My movies</h1>
+
+    <input type="text" name="title" id="title" />
+    <button id="add-movie">Add</button>
+
+    <button id="load-button">Load Movies</button>
+
+    <ul id="movie-list"></ul>
+    <p id="error-message"></p>
+
+    <script>
+        const buttonElement = document.getElementById('load-button');
+        const movieListElement = document.getElementById('movie-list');
+        const errorElement = document.getElementById('error-message');
+        const addButtonElement = document.getElementById('add-movie');
+        const titleElement = document.getElementById('title');
+
+        const BASE_URL = 'http://localhost:3030/jsonstore';
+
+        buttonElement.addEventListener('click', () => {
+            fetch(`${BASE_URL}/movies`)
+                .then(response => response.json())
+                .then(data => {
+                    let movies = Object.values(data);
+                    movieListElement.innerHTML = '';
+
+                    movies.forEach(movie => {
+                        let movieElement = document.createElement('li');
+                        movieElement.textContent = movie.title;
+                        movieListElement.appendChild(movieElement);
+                    });
+                })
+                .catch(err => errorElement.textContent = err);
+        });
+
+        addButtonElement.addEventListener('click', () => {
+            let titleValue = titleElement.value;
+
+            fetch(`${BASE_URL}/movies`, {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify({ title: titleValue })
+            })
+                .then(res => res.json())
+                .then(movie => {
+                    let movieElement = document.createElement('li');
+                    movieElement.textContent = movie.title;
+                    movieListElement.appendChild(movieElement);
+                })
+                .catch(err => console.log(err));
+        });
+    </script>
+</body>
+
+</html>
