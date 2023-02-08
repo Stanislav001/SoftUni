@@ -1,97 +1,96 @@
 window.addEventListener("load", solve);
 
 function solve() {
-  const submitFormButton = document.getElementById('form-btn');
+  const ageElement = document.getElementById('age');
+  const descriptionElement = document.getElementById('task');
+  const lastNameElement = document.getElementById('last-name');
+  const firstNameElement = document.getElementById('first-name');
+  const genderSelectElement = document.getElementById('genderSelect');
 
-  let firstNameElement = document.getElementById('first-name');
-  let lastNameElement = document.getElementById('last-name');
-  let ageElement = document.getElementById('age');
-  let genderElement = document.getElementById('genderSelect');
-  let descriptionElement = document.getElementById('task');
-  let listOfFinishingElement = document.getElementById('finished');
-  let listInProgressElement = document.getElementById('in-progress');
-  let progressCountElement = document.getElementById('progress-count');
+  const clearButton = document.getElementById('clear-btn');
+  const submitButton = document.getElementById('form-btn');
+  const finishedList = document.getElementById('finished');
+  const counter = document.getElementById('progress-count');
+  const inProgressList = document.getElementById('in-progress');
 
-  let liElement = document.createElement('li');
-
-  submitFormButton.addEventListener(('click'), (e) => {
+  submitButton.addEventListener('click', (e) => {
     e.preventDefault();
-    if (!firstNameElement.value || !lastNameElement.value || !ageElement.value || !descriptionElement.value) {
-      return
+
+    const firstNameValue = firstNameElement.value;
+    const lastNameValue = lastNameElement.value;
+    const ageValue = ageElement.value;
+    const genderValue = genderSelectElement.value;
+    const descriptionValue = descriptionElement.value;
+
+    if (!firstNameValue || !lastNameValue || !ageValue || !descriptionValue) {
+      return;
     }
-    createPost();
-    resetFieldValues();
-  });
 
-  function createPost() {
-    liElement.classList.add('each-line');
+    const liElement = document.createElement('li');
+    liElement.className = 'each-line';
 
-    let editButton = document.createElement('button');
-    let completeButton = document.createElement('button');
+    liElement.innerHTML = `
+      <article>
+        <h4>${firstNameValue} ${lastNameValue}</h4>
+        <p>${genderValue}, ${ageValue}</p>
+        <p>${descriptionValue}</p>
+      </article>
+      <button class="edit-btn">Edit</button>
+      <button class="complete-btn">Mark as complete</button>
+    `;
 
-    let articleElement = document.createElement('article');
-    let name = document.createElement('h4');
-    let maleAndAge = document.createElement('p');
-    let description = document.createElement('p');
+    inProgressList.appendChild(liElement);
 
-    editButton.classList.add('edit-btn');
-    completeButton.classList.add('complete-btn');
-
-    name.textContent = `${firstNameElement.value} ${lastNameElement.value}`;
-    maleAndAge.textContent = `${genderElement.value}, ${ageElement.value}`;
-    description.textContent = descriptionElement.value;
-    editButton.innerText = 'Edit';
-    completeButton.innerText = 'Mark as complete';
-
-    articleElement.appendChild(name);
-    articleElement.appendChild(maleAndAge);
-    articleElement.appendChild(description);
-
-    liElement.appendChild(articleElement);
-    liElement.appendChild(editButton);
-    liElement.appendChild(completeButton);
-
-    listInProgressElement.appendChild(liElement);
-    progressCountElement.textContent = Number(progressCountElement.textContent) + 1;
-
-    editButton.addEventListener(('click'), (e) => {
-      liElement.replaceChildren();
-      editButton.remove();
-      completeButton.remove();
-
-      const fullName = name.textContent.split(' ');
-      firstNameElement.value = fullName[0];
-      lastNameElement.value = fullName[1];
-
-      const maleAndAgeValues = maleAndAge.textContent.split(', ');
-      genderElement.value = maleAndAgeValues[0];
-      ageElement.value = maleAndAgeValues[1];
-      descriptionElement.value = description.textContent;
-      progressCountElement.textContent = Number(progressCountElement.textContent) - 1;
-    });
-
-    completeButton.addEventListener(('click'), (e) => {
-      listOfFinishingElement.appendChild(liElement);
-
-      editButton.remove();
-      completeButton.remove();
-
-      let clearButton = document.getElementById('clear-btn');
-      clearButton.addEventListener(('click'), (e) => {
-        listOfFinishingElement.replaceChildren();
-        clearButton.remove();
-      })
-
-      progressCountElement.textContent = Number(progressCountElement.textContent) - 1;
-    });
-  }
-
-  function resetFieldValues() {
-    firstNameElement.value = '';
-    lastNameElement.value = '';
     ageElement.value = '';
-    genderElement.selectedIndex = 0;
+    lastNameElement.value = '';
+    firstNameElement.value = '';
     descriptionElement.value = '';
-  }
-}
+    genderSelectElement.selectedIndex = 0;
 
+    counter.textContent = Number(counter.textContent) + 1;
+
+    const editButton = liElement.querySelector('.edit-btn');
+    const completeButton = liElement.querySelector('.complete-btn');
+
+    editButton.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      firstNameElement.value = firstNameValue;
+      lastNameElement.value = lastNameValue;
+      ageElement.value = ageValue;
+      genderSelectElement.value = genderValue;
+      descriptionElement.value = descriptionValue;
+
+      counter.textContent = Number(counter.textContent) - 1;
+      liElement.remove();
+    });
+
+    completeButton.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      liElement.remove();
+
+      const completeLiElement = document.createElement('li');
+      completeLiElement.className = 'each-line';
+
+      completeLiElement.innerHTML = `
+      <article>
+        <h4>${firstNameValue} ${lastNameValue}</h4>
+        <p>${genderValue}, ${ageValue}</p>
+        <p>${descriptionValue}</p>
+      </article>
+    `;
+
+      finishedList.appendChild(completeLiElement);
+      counter.textContent = Number(counter.textContent) - 1;
+    });
+
+    clearButton.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      while (finishedList.firstChild) {
+        finishedList.removeChild(finishedList.firstChild);
+      }
+    });
+  });
+}

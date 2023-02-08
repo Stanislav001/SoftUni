@@ -47,8 +47,6 @@ function attachEvents() {
 
     }
 
-
-
     async function request(url) {
         let result = {};
 
