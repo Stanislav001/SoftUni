@@ -1,96 +1,81 @@
-const URL = 'http://localhost:3030/jsonstore/phonebook';
-
-const phoneBookElement = document.getElementById('phonebook');
-
 function attachEvents() {
-    const loadButton = document.getElementById('btnLoad');
-    const createButton = document.getElementById('btnCreate');
+    let createBtn = document.querySelector('#btnCreate');
+    let loadBtn = document.querySelector('#btnLoad');
 
-    loadButton.addEventListener('click', () => {getDataHandler()});
-    createButton.addEventListener('click', addNewPhoneHandler);
+    loadBtn.addEventListener('click', loadBooks)
+    createBtn.addEventListener('click', createSubscriber)
 }
 
-async function getDataHandler() {
-    phoneBookElement.innerHTML = '';
-    const response = await fetch(URL);
-
-    if (response.ok) {
-        let data = await response.json();
-        Object.values(data).forEach(el => {
-            const liElement = document.createElement('li');
-            const deleteButton = document.createElement('button');
-    
-            liElement.textContent = `${el.person}: ${el.phone}`;
-            deleteButton.innerHTML = 'Delete';
-            deleteButton.setAttribute('id', el._id);
-    
-            liElement.appendChild(deleteButton);
-            phoneBookElement.appendChild(liElement);
-    
-            deleteButton.addEventListener('click', deletePhoneHandler);
-        });
-    }
-}
-
-async function addNewPhoneHandler() {
-    const phoneValue = document.getElementById('phone').value;
-    const personValue = document.getElementById('person').value;
-    const dataIsValid = checkDataHandler(phoneValue, personValue);
-
-    if (!dataIsValid) {
-        return;
-    }
+async function createSubscriber() {
+    let [personField, phoneField] = document.querySelectorAll('input[type=text]');
 
     try {
-        const response = await fetch(URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                person: personValue,
-                phone: phoneValue
-            })
+        if (personField.value == '' || phoneField.value == '') {
+            alert('Please fill the required fields!');
+            return;
+        }
+
+        const response = await fetch('http://localhost:3030/jsonstore/phonebook', {
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ person: `${personField.value}`, phone: `${phoneField.value}` })
+        });
+        const data = await response.json();
+
+        if (!response.ok || response.status != 200) {
+            let parse = JSON.parse(data);
+            throw new Error(parse.message);
+        }
+
+        personField.value = '';
+        phoneField.value = '';
+
+        loadBooks();
+        
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+async function loadBooks() {
+    let phonebookList = document.querySelector('#phonebook');
+    phonebookList.replaceChildren(); 
+
+    try {
+        const response = await fetch('http://localhost:3030/jsonstore/phonebook');
+        const data = await response.json();
+
+        if (!response.ok || response.status != 200) {
+            throw new Error(data.message);
+        }
+
+        Object.values(data).forEach(info => {
+            let listElement = document.createElement('li');
+            listElement.textContent = `${info.person}: ${info.phone}`;
+
+            let deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.setAttribute('id', info._id);
+
+            listElement.appendChild(deleteBtn);
+            phonebookList.appendChild(listElement);
+
+            deleteBtn.addEventListener('click', deleteEntry);
         });
 
-        if (response.ok) {
-            const result = await response.json();
-
-            const liElement = document.createElement('li');
-            const deleteButton = document.createElement('button');
-
-            liElement.textContent = `${result.person}: ${result.phone}`;
-            deleteButton.innerHTML = 'Delete';
-            deleteButton.setAttribute('id', result._id);
-
-            liElement.appendChild(deleteButton);
-            phoneBookElement.appendChild(liElement);
-
-            deleteButton.addEventListener('click', deletePhoneHandler);
-        }
     } catch (error) {
-        console.error(error);
+        alert(error.message);
     }
 }
 
-async function deletePhoneHandler(event) {
-    const id = event.target.parentNode.id;
-    event.target.parentNode.remove();
+async function deleteEntry(event) {
+    let targetId = event.target.getAttribute('id');
 
-    const response = await fetch(`${URL}/${id}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-type': 'application/json'
-        }
+    const response = await fetch(`http://localhost:3030/jsonstore/phonebook/${targetId}`, {
+        method: 'delete'
     });
-}
 
-function checkDataHandler(person, phone) {
-    let isValid = true;
-    if (!person || !phone) {
-        isValid = false;
-    }
-    return isValid;
+    event.target.parentNode.remove();
 }
 
 attachEvents();

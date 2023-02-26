@@ -1,57 +1,58 @@
-const submitButton = document.getElementById('submit');
-const URL = 'http://localhost:3030/jsonstore/messenger';
-const refreshButton = document.getElementById('refresh');
-const messageElement = document.getElementById('messages');
-
 function attachEvents() {
-    getMessages();
-    refreshButton.addEventListener('click', getMessages);
-    submitButton.addEventListener('click', addNewMessage);
-}
+    let chat = document.getElementById('messages');
+    const author = document.querySelector('input[name="author"]');
+    const content = document.querySelector('input[name="content"]');
 
-async function getMessages() {
-    messageElement.textContent = '';
-    const response = await fetch(URL);
-    const data = await response.json();
+    document.getElementById('submit').addEventListener('click', submit);
+    document.getElementById('refresh').addEventListener('click', refresh);
 
-    Object.values(data).forEach(message => {
-        messageElement.textContent += `${message.author}: ${message.content}\n`
-    });
-}
+    async function submit() {
+        try {
+            if (!author) {
+                throw new Error('Please enter a name!');
+            }
+            if (!content) {
+                throw new Error('Please enter a message!');
+            }
 
-async function addNewMessage() {
-    const authorElement = document.getElementsByName('author')[0];
-    const contentElement = document.getElementsByName('content')[0];
-    const dataIsValid = checkDataHandler(authorElement?.value, contentElement?.value);
+            const response = await fetch('http://localhost:3030/jsonstore/messenger', {
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    author: author.value,
+                    content: content.value
+                })
+            });
 
-    if (!dataIsValid) {
-        return;
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message);
+            }
+            content.value = '';
+        } catch (error) {
+            alert(error.message);
+        }
     }
 
-    try {
-        await fetch(URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                author: authorElement.value,
-                content: contentElement.value
-            })
-        });
-        messageElement.textContent += `${authorElement.value}: ${contentElement.value}\n`
-    } catch (error) {
-        console.error(error);
+    async function refresh() {
+        chat.value = '';
+        const response = await fetch('http://localhost:3030/jsonstore/messenger');
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message);
+        }
+
+        let data = await response.json();
+
+        data = Object.values(data);
+        const result = data.map(m => `${m.author}: ${m.content}\n`);
+        let chatText = '';
+        result.forEach(message => chatText += `${message}`);
+        chat.value = chatText.trimEnd();
     }
 }
 
-function checkDataHandler(author, content) {
-    let isValid = true;
-
-    if (!author || !content) {
-        isValid = false;
-    }
-
-    return isValid;
-}
 attachEvents();

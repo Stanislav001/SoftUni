@@ -1,4 +1,4 @@
-async function engine() {
+async function bookStore() {
     document.getElementById('loadBooks').addEventListener('click', getBooks);
     document.querySelector('form').addEventListener('submit', createBook);
     const tbody = document.querySelector('tbody');
@@ -162,4 +162,4 @@ async function engine() {
     }
 }
 
-engine();
+bookStore();
