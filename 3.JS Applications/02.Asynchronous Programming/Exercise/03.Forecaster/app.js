@@ -1,50 +1,71 @@
 function attachEvents() {
-    const submitButton = document.getElementById('submit');
-    const locationInputElement = document.getElementById('location');
+    const location = document.getElementById('location');
+    const submit = document.getElementById('submit').addEventListener('click', getLocation);
+    const forecast = document.getElementById('forecast');
+    const current = document.getElementById('current');
+    const upcoming = document.getElementById('upcoming');
 
-    submitButton.addEventListener('click', () => {
-        getLocationInfo();
+    const divForecasts = document.createElement('div');
+    const divForecastInfo = document.createElement('div');
 
-    });
+    async function getLocation(event) {
+        event.preventDefault();
 
+        divForecasts.innerHTML = '';
+        divForecastInfo.innerHTML = '';
 
-    async function getLocationInfo() {
         try {
-            const userInput = locationInputElement.value;
-            const currentInfoElement = document.getElementById('current');
-
             const locations = await request('http://localhost:3030/jsonstore/forecaster/locations');
-            const city = locations.find(c => c.name == userInput);
+            const city = locations.find(c => c.name == location.value);
+            if (city == undefined) {
+                throw new Error('Error');
+            }
 
-            if (city) {
-                const todayCityForecast = await request(`http://localhost:3030/jsonstore/forecaster/today/${city.code}`);
-                const { condition, high, low } = todayCityForecast.forecast;
+            const todayForecast = await request(`http://localhost:3030/jsonstore/forecaster/today/${city.code}`);
+            const { condition, high, low } = todayForecast.forecast;
 
-                const divForecasts = document.createElement('div');
-                divForecasts.classList.add('forecasts');
+            divForecasts.classList.add('forecasts');
 
-                let spanSymbol = createSymbolElement(condition, 'condition', 'symbol');
-                divForecasts.appendChild(spanSymbol);
+            let spanSymbol = createSymbolElement(condition, 'condition', 'symbol');
+            divForecasts.appendChild(spanSymbol);
 
-                const spanCondition = document.createElement('span');
-                spanCondition.classList.add('condition');
-                spanCondition.innerHTML = `
-                <span class="forecast-data">${todayCityForecast.name}</span>
+            const spanCondition = document.createElement('span');
+            spanCondition.classList.add('condition');
+            spanCondition.innerHTML = `
+                <span class="forecast-data">${todayForecast.name}</span>
                 <span class="forecast-data">${low}&#176;/${high}&#176;</span>
                 <span class="forecast-data">${condition}</span>
             `;
 
-                divForecasts.appendChild(spanCondition);;
-                current.appendChild(divForecasts);
+            divForecasts.appendChild(spanCondition);;
+            current.appendChild(divForecasts);
 
-                forecast.removeAttribute('style');
-                console.log(cityInfo);
+            forecast.removeAttribute('style');
+
+            const upcomingForecast = await request(`http://localhost:3030/jsonstore/forecaster/upcoming/${city.code}`);
+
+            divForecastInfo.classList.add('forecast-info');
+
+            for (const day of upcomingForecast.forecast) {
+                const { condition, high, low } = day;
+
+                const spanUpcoming = document.createElement('span');
+                spanUpcoming.classList.add('upcoming');
+
+                let span = createSymbolElement(condition, 'symbol');
+                spanUpcoming.appendChild(span);
+                spanUpcoming.innerHTML += `
+                    <span class="forecast-data">${low}&#176;/${high}&#176;</span>
+                    <span class="forecast-data">${condition}</span>
+                `
+
+                divForecastInfo.appendChild(spanUpcoming);
             }
+            upcoming.appendChild(divForecastInfo);
 
         } catch (error) {
-            console.log(error);
+            forecast.innerText = 'Error';
         }
-
     }
 
     async function request(url) {
@@ -56,43 +77,39 @@ function attachEvents() {
             if (response.status != 200) {
                 throw new Error('Error');
             }
-
             const data = await response.json();
-
             result = data;
         } catch (error) {
             result = 'Error';
         }
-
         return result;
     }
 
     function createSymbolElement(condition, class1, class2) {
-        const span = document.createElement('span');
-        span.classList.add(class1);
+        const spanElement = document.createElement('span');
+        spanElement.classList.add(class1);
 
         if (class2 != undefined) {
-            span.classList.add(class2);
+            spanElement.classList.add(class2);
         }
 
         switch (condition) {
             case 'Sunny':
-                span.textContent = '☀'
+                spanElement.textContent = '☀'
                 break;
             case 'Partly sunny':
-                span.textContent = '⛅'
+                spanElement.textContent = '⛅'
                 break;
             case 'Overcast':
-                span.textContent = '☁'
+                spanElement.textContent = '☁'
                 break;
             case 'Rain':
-                span.textContent = '☔'
+                spanElement.textContent = '☔'
                 break;
             default:
                 break;
         }
-
-        return span;
+        return spanElement;
     }
 }
 

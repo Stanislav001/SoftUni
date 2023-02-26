@@ -1,36 +1,29 @@
-function getInfo() {
-    const inputElement = document.getElementById('stopId');
-    const submitButton = document.getElementById('submit');
+async function getInfo() {
+    const buses = document.getElementById('buses');
+    const stopId = document.getElementById('stopId');
+    const result = document.getElementById('stopName');
 
-    submitButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        const userInput = inputElement.value;
+    try {
+        const id = stopId.value;
+        stopId.value = '';
+        result.innerText = '';
 
-        fetch(`http://localhost:3030/jsonstore/bus/businfo/${userInput}`)
-            .then(response => response.json())
-            .then(data => {
-                renderResult(data);
-            })
-            .catch(err => {
-                const busNameElement = document.getElementById('stopName');
-                busNameElement.textContent = 'Error';
-            });
+        const response = await fetch(`http://localhost:3030/jsonstore/bus/businfo/${id}`);
+        if (response.status != 200) {
+            throw new Error('Stop ID not found');
+        }
+        const data = await response.json();
 
+        result.textContent = data.name;
+        
+        let entries = Object.entries(data.buses);
+        for (const busNumber of entries) {
+            let li = document.createElement('li');
+            li.textContent = `Bus ${busNumber[0]} arrives in ${busNumber[1]} minutes`;
 
-    });
-
-    function renderResult(data) {
-        const busesList = document.getElementById('buses');
-        const busNameElement = document.getElementById('stopName');
-        const busesData = Object.entries(data.buses);
-
-        busNameElement.textContent = data.name
-
-        busesData.forEach(el => {
-            const liElement = document.createElement('li');
-
-            liElement.textContent = `Bus ${el[0]} arrives in ${el[1]} minutes`;
-            busesList.appendChild(liElement);
-        });
+            buses.appendChild(li);
+        }
+    } catch (error) {
+        result.textContent = "Error";
     }
 }
