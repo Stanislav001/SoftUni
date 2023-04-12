@@ -1,0 +1,43 @@
+body {
+    background-color: beige;
+}
+
+#content {
+    width: 980px;
+    margin: auto;
+    padding: 32px;
+    background-color: white;
+}
+
+nav li {
+    list-style: none;
+    display: inline-block;
+}
+
+nav a {
+    color: white;
+    padding: 4px 8px;
+    text-decoration: none;
+    background-color: rgb(123, 163, 189);
+}
+
+nav a:hover {
+    background-color: rgb(183, 189, 192);
+}
+
+.italics {
+    font-style: italic;
+}
+
+label {
+    display: block;
+}
+
+label span {
+    width: 75px;
+    display: inline-block;
+}
+
+.promoted {
+    color: rgb(182, 121, 41);
+}

@@ -1,0 +1,12 @@
+{{#with user}}
+<div>
+    <h1>Welcome to the site {{username}}</h1>
+    <p>Your email is {{email}}</p>
+</div>
+{{/with}}
+
+{{#if count}}
+<p>Site visited {{count}} times!</p>
+{{else}}
+<p>You are the first visitor!</p>
+{{/if}}

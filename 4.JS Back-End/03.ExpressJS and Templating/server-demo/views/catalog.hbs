@@ -1,0 +1,10 @@
+<h1>Catalog List</h1>
+<a href="/catalog/create">Create product</a>
+
+<ul>
+    {{#each products}}
+    {{> productItem}}
+    {{else}}
+    <span class="italics">No products in database</span>
+    {{/each}}
+</ul>

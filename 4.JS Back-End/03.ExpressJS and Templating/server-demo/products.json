@@ -1,0 +1,19 @@
+{
+  "asfsad123": {
+    "name": "Widget",
+    "price": 12
+  },
+  "341asad23": {
+    "name": "Cd PLayer",
+    "price": 52
+  },
+  "dasasad23": {
+    "name": "Book",
+    "price": 35
+  },
+  "57c77793": {
+    "name": "Computer",
+    "price": 1000,
+    "promoted": true
+  }
+}
