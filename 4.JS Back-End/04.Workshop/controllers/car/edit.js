@@ -24,7 +24,5 @@ module.exports = {
         } catch (error) {
             res.redirect('/404');
         }
-
-        res.redirect('/');
     }
 }
