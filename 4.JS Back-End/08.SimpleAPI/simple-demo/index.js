@@ -18,13 +18,16 @@ const data = [
 
 const app = express();
 
+app.use((req, res, next) => {
+    req.setHeader('Access-Control-Allow-Origin', '*');
+    req.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, HEAD, OPTIONS');
+    req.setHeader('Access-Control-Allow-Headers', 'Content-Type', 'X-Authorization');
+    next();
+});
 app.use(express.json());
 
 app.get('/', (req, res) => { res.json({ message: 'Hello' }); });
-
-app.get('/api/catalog', (req, res) => {
-    res.json(data);
-});
+app.get('/api/catalog', (req, res) => { res.json(data); });
 
 app.post('/api/catalog', (req, res) => {
     const id = 'dsads2312';
